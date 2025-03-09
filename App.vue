@@ -35,6 +35,7 @@
 	/*
 		全局公共样式和字体图标
 	*/
+	@import 'static/index.scss';
 	@font-face {
 		font-family: yticon;
 		font-weight: normal;

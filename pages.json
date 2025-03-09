@@ -183,6 +183,15 @@
 				"enablePullDownRefresh": true,
 				"navigationBarTitleText": "商品列表"
 			}
+		}, {
+			"path": "pages/chat_page/index",
+			"style": {
+				"navigationStyle": "custom",
+				"app-plus": {
+					"softinputNavBar": "none",
+					"bounce": "none"
+				}
+			}
 		}
 	],
 	"globalStyle": {
