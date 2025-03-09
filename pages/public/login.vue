@@ -88,8 +88,8 @@
 				if (result.status === 1) {
 					console.log(result.data)
 					const res = login(mobile, password, 1).then(res => {
-						uni.setStorageSync("token", res.token)
-						console.log('res.token', res.token)
+						uni.setStorageSync("token", res.data.token)
+						console.log('res.token', res.data.token)
 						uni.navigateBack();
 					});
 				} else {

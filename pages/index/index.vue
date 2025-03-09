@@ -69,7 +69,7 @@
 					<view v-for="(item, index) in goodsList" :key="index" class="floor-item"
 						@click="navToDetailPage(item)">
 						<image :src="item.image" mode="aspectFill"></image>
-						<text class="title clamp">{{item.title}}</text>
+						<text class="title clamp">{{item.name}}</text>
 						<text class="price">￥{{item.price}}</text>
 					</view>
 				</view>

@@ -24,7 +24,6 @@ uni.addInterceptor('request', {
 export function getRequest(url, params) {
 	return new Promise((resolve, reject) => {
 		const token = uni.getStorageSync("token")
-		console.log("token", token)
 		uni.request({
 			method: 'GET',
 			url: base_url + url,
