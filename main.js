@@ -41,13 +41,11 @@ const prePage = ()=>{
 	return prePage.$vm;
 }
 
-
 Vue.config.productionTip = false
 Vue.prototype.$fire = new Vue();
 Vue.prototype.$store = store;
 Vue.prototype.$api = {msg, json, prePage};
 Vue.config.productionTip = false
-
 App.mpType = 'app'
 
 const app = new Vue({

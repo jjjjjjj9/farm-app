@@ -6,6 +6,7 @@ Vue.use(Vuex)
 const store = new Vuex.Store({
 	state: {
 		hasLogin: false,
+		token: '',
 		userInfo: {},
 		// 文字大小
 		page_font_size: uni.getStorageSync('page_font_size') || 'page_font_size',
@@ -33,6 +34,9 @@ const store = new Vuex.Store({
                 key: 'userInfo'  
             })
 		},
+		SET_TOKEN: (state, token) => {
+		      state.token = token
+		    },
 		// 设置导航栏高度
 		SET_STATUSBAR(state, value) {
 			state.StatusBar = value
