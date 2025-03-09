@@ -24,17 +24,18 @@ uni.addInterceptor('request', {
 export function getRequest(url, params) {
 	return new Promise((resolve, reject) => {
 		const token = uni.getStorageSync("token")
-		console.log(base_url + url)
+		console.log("token", token)
 		uni.request({
 			method: 'GET',
 			url: base_url + url,
 			data: params,
 			params: params,
 			header: {
-				"token": token
+				'Authorization': 'Bearer ' + token,
+				'Content-Type': 'application/json;charset=utf-8'
 			},
 			success: res => {
-				if (res.data.statusCode !== "200") {
+				if (res.data.code != "200") {
 					reject(res.data);
 				}
 				resolve(res)
@@ -58,7 +59,7 @@ export function postRequest(url, params) {
 				"token": token
 			},
 			success: res => {
-				if (res.data.statusCode !== "200") {
+				if (res.data.code != "200") {
 					reject(res.data);
 				}
 				resolve(res)
@@ -83,7 +84,8 @@ export function postJsonRequest(url, params) {
 				"token": token
 			},
 			success: res => {
-				if (res.data.statusCode !== "200") {
+				console.log("res.data.code", res.data.code != "200")
+				if (res.data.code != "200") {
 					reject(res.data);
 				}
 				resolve(res)

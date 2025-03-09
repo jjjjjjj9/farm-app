@@ -65,7 +65,7 @@
 				this.$api.msg('去注册');
 			},
 			async toLogin() {
-				this.logining = true;
+				// this.logining = true;
 				const {
 					mobile,
 					password

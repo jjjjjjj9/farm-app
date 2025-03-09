@@ -1,7 +1,0 @@
-node_modules/
-/dist/
-/dev/
-/.DS_Store
-
-# 忽略UniApp编译生成的小程序相关目录
-/unpackage/
