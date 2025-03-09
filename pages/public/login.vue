@@ -84,19 +84,18 @@
 					mobile,
 					password
 				};
-				login(mobile, password, 1).then(res => {
-					uni.setStorageSync("token", res.token)
-					uni.navigateBack();
-				});
-				// const result = await this.$api.json('userInfo');
-				// if (result.status === 1) {
-				// 	console.log(result.data)
-
-				// 	// uni.navigateBack();
-				// } else {
-				// 	this.$api.msg(result.msg);
-				// 	this.logining = false;
-				// }
+				const result = await this.$api.json('userInfo');
+				if (result.status === 1) {
+					console.log(result.data)
+					const res = login(mobile, password, 1).then(res => {
+						uni.setStorageSync("token", res.token)
+						console.log('res.token', res.token)
+						uni.navigateBack();
+					});
+				} else {
+					this.$api.msg(result.msg);
+					this.logining = false;
+				}
 			}
 		},
 

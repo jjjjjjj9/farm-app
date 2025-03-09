@@ -26,14 +26,15 @@ export function register(username, password, code) {
 		username,
 		password,
 		code,
-		uuid
+		uuid,
+		type: 1
 	}
 	console.log("data", data)
 	return postJsonRequest('/register', data)
 }
 
-export function getUser() {
-	return getRequest("/user/getUser")
+export function getProductList() {
+	return getRequest("/system/project/list")
 }
 
 export function updateUser(user) {
