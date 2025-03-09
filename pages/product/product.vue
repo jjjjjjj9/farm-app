@@ -11,20 +11,19 @@
 		</view>
 
 		<view class="introduce-section">
-			<text class="title">恒源祥2019春季长袖白色t恤 新款春装</text>
+			<text class="title">{{projectInfo.projectInfo}}</text>
 			<view class="price-box">
 				<text class="price-tip">¥</text>
-				<text class="price">341.6</text>
+				<text class="price">{{projectInfo.price}}</text>
 			</view>
 			<view class="bot-row">
-				<text>销量: 108</text>
-				<text>库存: 4690</text>
-				<text>浏览量: 768</text>
+				<text>预约人数: 108</text>
+				<text>最大预约人数: {{projectInfo.availableCapacity}}</text>
+				<text>浏览量: {{projectInfo.cnt}}</text>
 			</view>
 		</view>
 
-		<!--  分享 -->
-		<view class="share-section" @click="share">
+		<!-- 	<view class="share-section" @click="share">
 			<view class="share-icon">
 				<text class="yticon icon-xingxing"></text>
 				返
@@ -36,9 +35,9 @@
 				<text class="yticon icon-you"></text>
 			</view>
 
-		</view>
+		</view> -->
 
-		<view class="c-list">
+		<!-- 	<view class="c-list">
 			<view class="c-row b-b" @click="toggleSpec">
 				<text class="tit">购买类型</text>
 				<view class="con">
@@ -54,26 +53,16 @@
 				<text class="yticon icon-you"></text>
 			</view>
 			<view class="c-row b-b">
-				<text class="tit">促销活动</text>
-				<view class="con-list">
-					<text>新人首单送20元无门槛代金券</text>
-					<text>订单满50减10</text>
-					<text>订单满100减30</text>
-					<text>单笔购买满两件免邮费</text>
-				</view>
-			</view>
-			<view class="c-row b-b">
 				<text class="tit">服务</text>
 				<view class="bz-list con">
 					<text>7天无理由退换货 ·</text>
 					<text>假一赔十 ·</text>
 				</view>
 			</view>
-		</view>
+		</view> -->
 
-		<!-- 评价 -->
 		<view class="eva-section">
-			<view class="e-header">
+			<view class="e-header" @click="toComment()">
 				<text class="tit">评价</text>
 				<text>(86)</text>
 				<text class="tip">好评率 100%</text>
@@ -93,12 +82,12 @@
 			</view>
 		</view>
 
-		<view class="detail-desc">
+		<!-- <view class="detail-desc">
 			<view class="d-header">
 				<text>图文详情</text>
 			</view>
 			<rich-text :nodes="desc"></rich-text>
-		</view>
+		</view> -->
 
 		<!-- 底部操作菜单 -->
 		<view class="page-bottom">
@@ -106,18 +95,18 @@
 				<text class="yticon icon-xiatubiao--copy"></text>
 				<text>首页</text>
 			</navigator>
-			<navigator url="/pages/cart/cart" open-type="switchTab" class="p-b-btn">
-				<text class="yticon icon-gouwuche"></text>
-				<text>购物车</text>
-			</navigator>
 			<view class="p-b-btn" :class="{active: favorite}" @click="toFavorite">
 				<text class="yticon icon-shoucang"></text>
 				<text>收藏</text>
 			</view>
+			<view class="p-b-btn" :class="{active: favorite}" @click="toAsk">
+				<text class="yticon icon-shoucang"></text>
+				<text>咨询</text>
+			</view>
 
 			<view class="action-btn-group">
-				<button type="primary" class=" action-btn no-border buy-now-btn" @click="buy">立即购买</button>
-				<button type="primary" class=" action-btn no-border add-cart-btn">加入购物车</button>
+				<button type="primary" class=" action-btn no-border buy-now-btn" @click="buy">立即预定</button>
+				<!-- <button type="primary" class=" action-btn no-border add-cart-btn">加入购物车</button> -->
 			</view>
 		</view>
 
@@ -162,12 +151,16 @@
 
 <script>
 	import share from '@/components/share';
+	import {
+		getProject
+	} from '@/api/product'
 	export default {
 		components: {
 			share
 		},
 		data() {
 			return {
+				projectInfo: {},
 				specClass: 'none',
 				specSelected: [],
 
@@ -256,8 +249,8 @@
 			if (id) {
 				this.$api.msg(`点击了${id}`);
 			}
-
-
+			const res = await getProject(id)
+			this.projectInfo = res.data.data
 			//规格 默认选中第一条
 			this.specList.forEach(item => {
 				for (let cItem of this.specChildList) {
@@ -314,11 +307,22 @@
 			toFavorite() {
 				this.favorite = !this.favorite;
 			},
+			toAsk() {
+				uni.navigateTo({
+					url: `/pages/chat_page/index`
+				})
+			},
 			buy() {
 				uni.navigateTo({
 					url: `/pages/order/createOrder`
 				})
 			},
+			toComment() {
+				uni.navigateTo({
+					url: `kai-comment`
+				})
+			},
+
 			stopPrevent() {}
 		},
 
@@ -867,7 +871,7 @@
 			box-shadow: 0 20upx 40upx -16upx #fa436a;
 			box-shadow: 1px 2px 5px rgba(219, 63, 96, 0.4);
 			background: linear-gradient(to right, #ffac30, #fa436a, #F56C6C);
-			margin-left: 20upx;
+			margin-left: 300upx;
 			position: relative;
 
 			&:after {

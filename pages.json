@@ -40,9 +40,30 @@
 			}
 		},
 		{
+			"path": "pages/chat_page/index",
+			"style": {
+				"navigationStyle": "custom",
+				"app-plus": {
+					"softinputNavBar": "none",
+					"bounce": "none"
+				}
+			}
+		},
+		{
 			"path": "pages/product/product",
 			"style": {
 				"navigationBarTitleText": "详情展示",
+				"app-plus": {
+					"titleNView": {
+						"type": "transparent"
+					}
+				}
+			}
+		},
+		{
+			"path": "pages/product/kai-comment",
+			"style": {
+				"navigationBarTitleText": "评价",
 				"app-plus": {
 					"titleNView": {
 						"type": "transparent"
@@ -182,15 +203,6 @@
 			"style": {
 				"enablePullDownRefresh": true,
 				"navigationBarTitleText": "商品列表"
-			}
-		}, {
-			"path": "pages/chat_page/index",
-			"style": {
-				"navigationStyle": "custom",
-				"app-plus": {
-					"softinputNavBar": "none",
-					"bounce": "none"
-				}
 			}
 		}
 	],

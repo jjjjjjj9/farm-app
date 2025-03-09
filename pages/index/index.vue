@@ -28,41 +28,36 @@
 		</view>
 		<!-- 分类 -->
 		<view class="cate-section">
-			<view class="cate-item">
+			<view class="cate-item" @click="navToDetailPage(item)">
 				<image src="/static/temp/c3.png"></image>
-				<text>环球美食</text>
+				<text>亲子体验农庄</text>
 			</view>
 			<view class="cate-item">
 				<image src="/static/temp/c5.png"></image>
-				<text>个护美妆</text>
+				<text>休闲度假农庄</text>
 			</view>
 			<view class="cate-item">
 				<image src="/static/temp/c6.png"></image>
-				<text>营养保健</text>
+				<text>农业观光农庄</text>
 			</view>
-			<view class="cate-item">
+			<!-- 		<view class="cate-item">
 				<image src="/static/temp/c7.png"></image>
 				<text>家居厨卫</text>
 			</view>
 			<view class="cate-item">
 				<image src="/static/temp/c8.png"></image>
 				<text>速食生鲜</text>
-			</view>
+			</view> -->
 		</view>
 
-		<view class="ad-1">
+		<!-- 	<view class="ad-1">
 			<image src="/static/temp/ad1.jpg" mode="scaleToFill"></image>
-		</view>
+		</view> -->
 
 		<!-- 秒杀楼层 -->
 		<view class="seckill-section m-t">
 			<view class="s-header">
-				<image class="s-img" src="/static/temp/secskill-img.jpg" mode="widthFix"></image>
-				<text class="tip">8点场</text>
-				<text class="hour timer">07</text>
-				<text class="minute timer">13</text>
-				<text class="second timer">55</text>
-				<text class="yticon icon-you"></text>
+				<text class="tip">浏览热门</text>
 			</view>
 			<scroll-view class="floor-list" scroll-x>
 				<view class="scoll-wrapper">
@@ -76,61 +71,7 @@
 			</scroll-view>
 		</view>
 
-		<!-- 团购楼层 -->
-		<view class="f-header m-t">
-			<image src="/static/temp/h1.png"></image>
-			<view class="tit-box">
-				<text class="tit">精品团购</text>
-				<text class="tit2">Boutique Group Buying</text>
-			</view>
-			<text class="yticon icon-you"></text>
-		</view>
-		<view class="group-section">
-			<swiper class="g-swiper" :duration="500">
-				<swiper-item class="g-swiper-item" v-for="(item, index) in goodsList" :key="index" v-if="index%2 === 0"
-					@click="navToDetailPage(item)">
-					<view class="g-item left">
-						<image :src="item.image" mode="aspectFill"></image>
-						<view class="t-box">
-							<text class="title clamp">{{item.title}}</text>
-							<view class="price-box">
-								<text class="price">￥{{item.price}}</text>
-								<text class="m-price">￥188</text>
-							</view>
-
-							<view class="pro-box">
-								<view class="progress-box">
-									<progress percent="72" activeColor="#fa436a" active stroke-width="6" />
-								</view>
-								<text>6人成团</text>
-							</view>
-						</view>
-
-					</view>
-					<view class="g-item right">
-						<image :src="goodsList[index+1].image" mode="aspectFill"></image>
-						<view class="t-box">
-							<text class="title clamp">{{goodsList[index+1].title}}</text>
-							<view class="price-box">
-								<text class="price">￥{{goodsList[index+1].price}}</text>
-								<text class="m-price">￥188</text>
-							</view>
-							<view class="pro-box">
-								<view class="progress-box">
-									<progress percent="72" activeColor="#fa436a" active stroke-width="6" />
-								</view>
-								<text>10人成团</text>
-							</view>
-						</view>
-					</view>
-				</swiper-item>
-
-			</swiper>
-		</view>
-
-
-
-		<!-- 分类推荐楼层 -->
+		<!-- 	分类推荐楼层
 		<view class="f-header m-t">
 			<image src="/static/temp/h1.png"></image>
 			<view class="tit-box">
@@ -150,7 +91,7 @@
 					<view v-for="(item, index) in goodsList" :key="index" class="floor-item"
 						@click="navToDetailPage(item)">
 						<image :src="item.image" mode="aspectFill"></image>
-						<text class="title clamp">{{item.title}}</text>
+						<text class="title clamp">{{item.name}}</text>
 						<text class="price">￥{{item.price}}</text>
 					</view>
 					<view class="more">
@@ -171,7 +112,7 @@
 					<view v-for="(item, index) in goodsList" :key="index" class="floor-item"
 						@click="navToDetailPage(item)">
 						<image :src="item.image3" mode="aspectFill"></image>
-						<text class="title clamp">{{item.title}}</text>
+						<text class="title clamp">{{item.name}}</text>
 						<text class="price">￥{{item.price}}</text>
 					</view>
 					<view class="more">
@@ -180,8 +121,8 @@
 					</view>
 				</view>
 			</scroll-view>
-		</view>
-		<view class="hot-floor">
+		</view> -->
+		<!-- 		<view class="hot-floor">
 			<view class="floor-img-box">
 				<image class="floor-img"
 					src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1553409794730&di=12b840ec4f5748ef06880b85ff63e34e&imgtype=0&src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F01dc03589ed568a8012060c82ac03c.jpg%40900w_1l_2o_100sh.jpg"
@@ -192,7 +133,8 @@
 					<view v-for="(item, index) in goodsList" :key="index" class="floor-item"
 						@click="navToDetailPage(item)">
 						<image :src="item.image2" mode="aspectFill"></image>
-						<text class="title clamp">{{item.title}}</text>
+						{{item.name}}
+						<text class="title clamp">{{item.name}}</text>
 						<text class="price">￥{{item.price}}</text>
 					</view>
 					<view class="more">
@@ -201,7 +143,7 @@
 					</view>
 				</view>
 			</scroll-view>
-		</view>
+		</view> -->
 
 		<!-- 猜你喜欢 -->
 		<view class="f-header m-t">
@@ -218,7 +160,7 @@
 				<view class="image-wrapper">
 					<image :src="item.image" mode="aspectFill"></image>
 				</view>
-				<text class="title clamp">{{item.title}}</text>
+				<text class="title clamp">{{item.name}}</text>
 				<text class="price">￥{{item.price}}</text>
 			</view>
 		</view>
@@ -257,9 +199,10 @@
 				this.swiperLength = carouselList.length;
 				this.carouselList = carouselList;
 
-				let goodsList = await getProductList();
-				console.log(goodsList)
-				this.goodsList = goodsList || [];
+				let res = await getProductList();
+				console.log(res)
+				// console.log(goodsList)
+				this.goodsList = res.data.data || [];
 			},
 			//轮播图切换修改背景色
 			swiperChange(e) {
@@ -270,7 +213,7 @@
 			//详情页
 			navToDetailPage(item) {
 				//测试数据没有写id，用title代替
-				let id = item.title;
+				let id = item.id;
 				uni.navigateTo({
 					url: `/pages/product/product?id=${id}`
 				})
@@ -493,9 +436,14 @@
 			}
 
 			.tip {
-				font-size: $font-base;
-				color: $font-color-light;
-				margin: 0 20upx 0 40upx;
+				font-size: 17px;
+				color: red;
+				font-weight: 600;
+				margin: 0 20upx 0 0;
+				// text-shadow: 2px 2px 4px rgba(153, 4, 14, 0.5);
+				background: linear-gradient(to right, #ff7e5f, #feb47b);
+				-webkit-background-clip: text;
+				color: transparent;
 			}
 
 			.timer {
