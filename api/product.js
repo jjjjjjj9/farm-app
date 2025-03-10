@@ -10,8 +10,8 @@ import {
 // 生成一个 UUID
 
 
-export function getViews() {
-	return getRequest("/system/view/userView")
+export function getProductList() {
+	return getRequest("/system/project/passList")
 }
 
 export function getProject(id) {

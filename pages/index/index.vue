@@ -28,15 +28,15 @@
 		</view>
 		<!-- 分类 -->
 		<view class="cate-section">
-			<view class="cate-item" @click="navToDetailPage(item)">
+			<view class="cate-item" @click="navToSelectList('A')">
 				<image src="/static/temp/c3.png"></image>
 				<text>亲子体验农庄</text>
 			</view>
-			<view class="cate-item">
+			<view class="cate-item" @click="navToSelectList('B')">
 				<image src="/static/temp/c5.png"></image>
 				<text>休闲度假农庄</text>
 			</view>
-			<view class="cate-item">
+			<view class="cate-item" @click="navToSelectList('C')">
 				<image src="/static/temp/c6.png"></image>
 				<text>农业观光农庄</text>
 			</view>
@@ -63,7 +63,7 @@
 				<view class="scoll-wrapper">
 					<view v-for="(item, index) in goodsList" :key="index" class="floor-item"
 						@click="navToDetailPage(item)">
-						<image :src="item.image" mode="aspectFill"></image>
+						<image :src="item.images" mode="aspectFill"></image>
 						<text class="title clamp">{{item.name}}</text>
 						<text class="price">￥{{item.price}}</text>
 					</view>
@@ -158,7 +158,7 @@
 		<view class="guess-section">
 			<view v-for="(item, index) in goodsList" :key="index" class="guess-item" @click="navToDetailPage(item)">
 				<view class="image-wrapper">
-					<image :src="item.image" mode="aspectFill"></image>
+					<image :src="item.images" mode="aspectFill"></image>
 				</view>
 				<text class="title clamp">{{item.name}}</text>
 				<text class="price">￥{{item.price}}</text>
@@ -171,7 +171,7 @@
 
 <script>
 	import {
-		getProductList
+		getProductList,
 	} from '@/api/product'
 	export default {
 
@@ -186,6 +186,14 @@
 		},
 
 		onLoad() {
+			const token = uni.getStorageSync("token")
+			console.log(token)
+			if (token == null) {
+				uni.navigateTo({
+					url: '/pages/public/login'
+				})
+			}
+
 			this.loadData();
 		},
 		methods: {
@@ -200,15 +208,26 @@
 				this.carouselList = carouselList;
 
 				let res = await getProductList();
-				console.log(res)
-				// console.log(goodsList)
 				this.goodsList = res.data.data || [];
+				for (let item of this.goodsList) {
+					if (item.images != null) {
+						let imageList = item.images.split(",")
+						item.images = '/static/uploadImg/' + imageList[0]
+					}
+				}
+				console.log(this.goodsList)
 			},
 			//轮播图切换修改背景色
 			swiperChange(e) {
 				const index = e.detail.current;
 				this.swiperCurrent = index;
 				this.titleNViewBackground = this.carouselList[index].background;
+			},
+			navToSelectList(id) {
+				//测试数据没有写id，用title代替
+				uni.navigateTo({
+					url: `/pages/product/list?type=${id}`
+				})
 			},
 			//详情页
 			navToDetailPage(item) {

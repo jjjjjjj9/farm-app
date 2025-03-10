@@ -11,46 +11,55 @@
 			<swiper-item class="tab-content" v-for="(tabItem,tabIndex) in navList" :key="tabIndex">
 				<scroll-view class="list-scroll-content" scroll-y @scrolltolower="loadData">
 					<!-- 空白页 -->
-					<empty v-if="tabItem.loaded === true && tabItem.orderList.length === 0"></empty>
+					<empty v-if="tabItem.loaded === true && orderList.length === 0"></empty>
 
 					<!-- 订单列表 -->
-					<view v-for="(item,index) in tabItem.orderList" :key="index" class="order-item">
+					<view v-for="(item, index) in orderList" :key="index" class="order-item">
+						<!-- 订单头部 -->
 						<view class="i-top b-b">
-							<text class="time">{{item.time}}</text>
-							<text class="state" :style="{color: item.stateTipColor}">{{item.stateTip}}</text>
-							<text v-if="item.state===9" class="del-btn yticon icon-iconfontshanchu1"
-								@click="deleteOrder(index)"></text>
+							<text class="time">{{ item.createTime }}</text>
+							<text class="state" :style="{ color: item.stateTipColor }">{{ item.stateTip }}</text>
+							<text v-if="item.state === 9" class="del-btn yticon icon-iconfontshanchu1"
+								@click="confirmDeleteOrder(index)">
+								删除
+							</text>
 						</view>
 
-						<scroll-view v-if="item.goodsList.length > 1" class="goods-box" scroll-x>
-							<view v-for="(goodsItem, goodsIndex) in item.goodsList" :key="goodsIndex"
-								class="goods-item">
-								<image class="goods-img" :src="goodsItem.image" mode="aspectFill"></image>
-							</view>
-						</scroll-view>
-						<view v-if="item.goodsList.length === 1" class="goods-box-single"
-							v-for="(goodsItem, goodsIndex) in item.goodsList" :key="goodsIndex">
-							<image class="goods-img" :src="goodsItem.image" mode="aspectFill"></image>
+						<!-- 营业时间提示 -->
+						<view class="business-time">
+							<text class="tip">请在农场营业时间内进行消费：</text>
+							<text class="time">{{ item.businessTime }}</text>
+						</view>
+
+						<view class="goods-box-single">
+							<image class="goods-img" :src="item.projectImages" mode="aspectFill"></image>
 							<view class="right">
-								<text class="title clamp">{{goodsItem.title}}</text>
-								<text class="attr-box">{{goodsItem.attr}} x {{goodsItem.number}}</text>
-								<text class="price">{{goodsItem.price}}</text>
+								<text class="title clamp">{{ item.projectName }}</text>
+								<!-- <text class="attr-box">{{ item.attr }} x {{ item.number }}</text> -->
+								<text class="price">{{ item.projectPrice }}</text>
 							</view>
 						</view>
 
+						<!-- 订单金额 -->
 						<view class="price-box">
-							共
-							<text class="num">7</text>
-							件商品 实付款
-							<text class="price">143.7</text>
+							实付款
+							<text class="price">{{ item.price }}</text>
 						</view>
-						<view class="action-box b-t" v-if="item.state != 9">
-							<button class="action-btn" @click="cancelOrder(item)">取消订单</button>
-							<button class="action-btn recom">立即支付</button>
+
+						<!-- 操作按钮 -->
+						<view class="action-box b-t" v-if="item.orderStatus != 'C'">
+							<button class="action-btn" @click="cancelOrder(item) ">取消订单</button>
+							<button class="action-btn recom" @click="payOrder(item)"
+								v-if="item.orderStatus=='A'">立即支付</button>
+							<button class="action-btn recom" @click="confirmOrder(item)"
+								v-if="item.orderStatus=='D'">确认完成</button>
+							<button class="action-btn recom" @click="toComment(item)"
+								v-if="item.orderStatus=='E'">去评价</button>
+							<button class="action-btn recom" @click="toRefund(item)"
+								v-if="item.orderStatus=='E'">退款</button>
 						</view>
 					</view>
-
-					<uni-load-more :status="tabItem.loadingType"></uni-load-more>
+					<uni-load-more :status=" tabItem.loadingType"></uni-load-more>
 
 				</scroll-view>
 			</swiper-item>
@@ -61,6 +70,12 @@
 <script>
 	import uniLoadMore from '@/components/uni-load-more/uni-load-more.vue';
 	import empty from "@/components/empty";
+	import {
+		getOrderList,
+		pay,
+		cancel,
+		confirm
+	} from "@/api/order";
 	import Json from '@/Json';
 	export default {
 		components: {
@@ -69,6 +84,7 @@
 		},
 		data() {
 			return {
+				orderList: [],
 				tabCurrentIndex: 0,
 				orderType: '',
 				navList: [{
@@ -85,22 +101,22 @@
 					},
 					{
 						state: 2,
-						text: '待收货',
+						text: '待确认',
 						loadingType: 'more',
 						orderList: []
 					},
 					{
 						state: 3,
-						text: '待评价',
+						text: '待完成',
 						loadingType: 'more',
 						orderList: []
 					},
 					{
 						state: 4,
-						text: '售后',
+						text: '待评价',
 						loadingType: 'more',
 						orderList: []
-					}
+					},
 				],
 			};
 		},
@@ -112,66 +128,81 @@
 			 */
 			this.tabCurrentIndex = +options.state;
 			if (this.tabCurrentIndex == 1) {
-				orderType == 'A'
+				this.orderType = 'A'
 			} else if (this.tabCurrentIndex == 2) {
-				orderType == 'D'
-			} else if (this.tabCurrentIndex == 4) {
-				orderType == 'E'
+				this.orderType = 'B'
+			} else if (this.tabCurrentIndex == 3) {
+				this.orderType = 'D'
+			} else if (this.tabCurrentIndesx == 4) {
+				this.orderType = 'E'
+			} else if (this.tabCurrentIndex == 0) {
+				this.orderType = null
 			}
 			this.loadData()
 		},
 
 		methods: {
 			//获取订单列表
-			loadData(source) {
+			async loadData() {
 				//这里是将订单挂载到tab列表下
 				let index = this.tabCurrentIndex;
 				let navItem = this.navList[index];
 				let state = navItem.state;
 
-				if (source === 'tabChange' && navItem.loaded === true) {
-					//tab切换只有第一次需要加载数据
-					return;
-				}
 				if (navItem.loadingType === 'loading') {
 					//防止重复加载
 					return;
 				}
 
 				navItem.loadingType = 'loading';
+				console.log("ordertype", this.orderType)
+				const res = await getOrderList(this.orderType)
 
+				this.orderList = res.data.data
+				for (let item of this.orderList) {
+					if (item.projectImages != null) {
+						let imageList = item.projectImages.split(",")
+						item.projectImages = '/static/uploadImg/' + imageList[0]
+					}
+				}
+				this.$set(navItem, 'loaded', true);
 
+				//判断是否还有数据， 有改为 more， 没有改为noMore 
+				navItem.loadingType = 'more';
 
-				setTimeout(() => {
-					let orderList = Json.orderList.filter(item => {
-						//添加不同状态下订单的表现形式
-						item = Object.assign(item, this.orderStateExp(item.state));
-						//演示数据所以自己进行状态筛选
-						if (state === 0) {
-							//0为全部订单
-							return item;
-						}
-						return item.state === state
-					});
-					orderList.forEach(item => {
-						navItem.orderList.push(item);
-					})
-					//loaded新字段用于表示数据加载完毕，如果为空可以显示空白页
-					this.$set(navItem, 'loaded', true);
-
-					//判断是否还有数据， 有改为 more， 没有改为noMore 
-					navItem.loadingType = 'more';
-				}, 600);
 			},
 
 			//swiper 切换
 			changeTab(e) {
 				this.tabCurrentIndex = e.target.current;
-				this.loadData('tabChange');
+				if (this.tabCurrentIndex == 1) {
+					this.orderType = 'A'
+				} else if (this.tabCurrentIndex == 2) {
+					this.orderType = 'B'
+				} else if (this.tabCurrentIndex == 3) {
+					this.orderType = 'D'
+				} else if (this.tabCurrentIndex == 4) {
+					this.orderType = 'E'
+				} else if (this.tabCurrentIndex == 0) {
+					this.orderType = null
+				}
+				this.loadData();
 			},
 			//顶部tab点击
 			tabClick(index) {
 				this.tabCurrentIndex = index;
+				if (this.tabCurrentIndex == 1) {
+					this.orderType = 'A'
+				} else if (this.tabCurrentIndex == 2) {
+					this.orderType = 'B'
+				} else if (this.tabCurrentIndex == 3) {
+					this.orderType = 'D'
+				} else if (this.tabCurrentIndex == 4) {
+					this.orderType = 'E'
+				} else if (this.tabCurrentIndex == 0) {
+					this.orderType = null
+				}
+				this.loadData();
 			},
 			//删除订单
 			deleteOrder(index) {
@@ -183,29 +214,48 @@
 					uni.hideLoading();
 				}, 600)
 			},
+			payOrder(item) {
+				console.log(item); // 打印订单数据，便于调试
+				const orderData = JSON.stringify({
+					order: item
+				});
+				const encodedData = encodeURIComponent(orderData);
+				uni.navigateTo({
+					url: `/pages/money/pay?data=${encodedData}`
+				});
+			},
+			async confirmOrder(item) {
+				console.log(item); // 打印订单数据，便于调试
+				const res = await confirm(item.id)
+				if (res.data.code == '200') {
+					this.$api.msg(`确认成功`);
+				}
+				this.loadData()
+			},
+			async toComment(item) {
+				const orderData = JSON.stringify({
+					order: item
+				});
+				const encodedData = encodeURIComponent(orderData);
+				uni.navigateTo({
+					url: `/pages/comment/comment?data=${encodedData}`
+				});
+			},
+			async toRefund(item) {
+				console.log(item); // 打印订单数据，便于调试
+				const res = await refund(item.id)
+				if (res.data.code == '200') {
+					this.$api.msg(`确认成功`);
+				}
+				this.loadData()
+			},
 			//取消订单
-			cancelOrder(item) {
-				uni.showLoading({
-					title: '请稍后'
-				})
-				setTimeout(() => {
-					let {
-						stateTip,
-						stateTipColor
-					} = this.orderStateExp(9);
-					item = Object.assign(item, {
-						state: 9,
-						stateTip,
-						stateTipColor
-					})
-
-					//取消订单后删除待付款中该项
-					let list = this.navList[1].orderList;
-					let index = list.findIndex(val => val.id === item.id);
-					index !== -1 && list.splice(index, 1);
-
-					uni.hideLoading();
-				}, 600)
+			async cancelOrder(item) {
+				// uni.showLoading({
+				// 	title: '请稍后'
+				// })
+				const res = await cancel(item.id)
+				this.loadData()
 			},
 
 			//订单状态文字和颜色
@@ -588,6 +638,142 @@
 
 		100% {
 			opacity: .2
+		}
+	}
+
+	.order-item {
+		background: #fff;
+		margin-bottom: 10px;
+		border-radius: 8px;
+		overflow: hidden;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+		.business-time {
+			padding: 10px;
+			font-size: 12px;
+			color: #666;
+			// background: #f9f9f9;
+
+			.tip {
+				font-weight: bold;
+			}
+
+			.time {
+				margin-left: 5px;
+			}
+		}
+
+		.i-top {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 10px;
+			border-bottom: 1px solid #f2f2f2;
+
+			.time {
+				font-size: 14px;
+				color: #666;
+			}
+
+			.state {
+				font-size: 14px;
+				font-weight: bold;
+			}
+
+			.del-btn {
+				font-size: 16px;
+				color: #ff4d4f;
+				cursor: pointer;
+			}
+		}
+
+		.goods-box {
+			padding: 10px;
+			background: #f9f9f9;
+
+			.goods-scroll {
+				white-space: nowrap;
+			}
+
+			.goods-item {
+				display: inline-block;
+				margin-right: 10px;
+
+				.goods-img {
+					width: 60px;
+					height: 60px;
+					border-radius: 4px;
+				}
+			}
+		}
+
+		.goods-box-single {
+			display: flex;
+			padding: 10px;
+
+			.goods-img {
+				width: 60px;
+				height: 60px;
+				border-radius: 4px;
+				margin-right: 10px;
+			}
+
+			.right {
+				flex: 1;
+
+				.title {
+					font-size: 14px;
+					color: #333;
+				}
+
+				.attr-box {
+					font-size: 12px;
+					color: #999;
+				}
+
+				.price {
+					font-size: 14px;
+					color: #ff4d4f;
+					font-weight: bold;
+				}
+			}
+		}
+
+		.price-box {
+			padding: 10px;
+			text-align: right;
+			font-size: 14px;
+			color: #333;
+
+			.num {
+				color: #ff4d4f;
+				font-weight: bold;
+			}
+
+			.price {
+				color: #ff4d4f;
+				font-size: 16px;
+				font-weight: bold;
+			}
+		}
+
+		.action-box {
+			display: flex;
+			justify-content: flex-end;
+			padding: 10px;
+
+			.action-btn {
+				margin-left: 10px;
+				border: none;
+				border-radius: 4px;
+				font-size: 14px;
+				color: #fff;
+				background: #ff4d4f;
+
+				&.recom {
+					background: #1aad19;
+				}
+			}
 		}
 	}
 </style>

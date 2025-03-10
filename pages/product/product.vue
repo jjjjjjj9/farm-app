@@ -17,7 +17,7 @@
 				<text class="price">{{projectInfo.price}}</text>
 			</view>
 			<view class="bot-row">
-				<text>预约人数: 108</text>
+				<text>预约人数: {{projectInfo.ocnt}}</text>
 				<text>最大预约人数: {{projectInfo.availableCapacity}}</text>
 				<text>浏览量: {{projectInfo.cnt}}</text>
 			</view>
@@ -152,6 +152,9 @@
 <script>
 	import share from '@/components/share';
 	import {
+		createOrder
+	} from '@/api/order';
+	import {
 		getProject
 	} from '@/api/product'
 	export default {
@@ -246,24 +249,24 @@
 
 			//接收传值,id里面放的是标题，因为测试数据并没写id 
 			let id = options.id;
-			if (id) {
-				this.$api.msg(`点击了${id}`);
-			}
-			const res = await getProject(id)
-			this.projectInfo = res.data.data
-			//规格 默认选中第一条
-			this.specList.forEach(item => {
-				for (let cItem of this.specChildList) {
-					if (cItem.pid === item.id) {
-						this.$set(cItem, 'selected', true);
-						this.specSelected.push(cItem);
-						break; //forEach不能使用break
-					}
-				}
-			})
+			await this.loadData(id)
 			this.shareList = await this.$api.json('shareList');
 		},
 		methods: {
+			async loadData(id) {
+				const res = await getProject(id)
+				this.projectInfo = res.data.data
+				//规格 默认选中第一条
+				this.specList.forEach(item => {
+					for (let cItem of this.specChildList) {
+						if (cItem.pid === item.id) {
+							this.$set(cItem, 'selected', true);
+							this.specSelected.push(cItem);
+							break; //forEach不能使用break
+						}
+					}
+				})
+			},
 			//规格弹窗开关
 			toggleSpec() {
 				if (this.specClass === 'show') {
@@ -312,10 +315,17 @@
 					url: `/pages/chat_page/index`
 				})
 			},
-			buy() {
-				uni.navigateTo({
-					url: `/pages/order/createOrder`
-				})
+			async buy() {
+				console.log(this.projectInfo)
+				const res = await createOrder(this.projectInfo)
+				console.log(res)
+				if (res.data.code == '200') {
+					this.$api.msg(`预定成功`);
+					this.loadData(this.projectInfo.id)
+				}
+				// uni.navigateTo({
+				// 	url: `/pages/order/createOrder`
+				// })
 			},
 			toComment() {
 				uni.navigateTo({

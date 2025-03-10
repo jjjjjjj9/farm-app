@@ -11,7 +11,7 @@
 		},
 		onLaunch: function() {
 			let userInfo = uni.getStorageSync('userInfo') || '';
-			if(userInfo.id){
+			if (userInfo.id) {
 				//更新登陆状态
 				uni.getStorage({
 					key: 'userInfo',
@@ -20,7 +20,7 @@
 					}
 				});
 			}
-			
+
 		},
 		onShow: function() {
 			console.log('App Show')
@@ -32,10 +32,12 @@
 </script>
 
 <style lang='scss'>
+	@import "uview-ui/index.scss";
 	/*
 		全局公共样式和字体图标
 	*/
 	@import 'static/index.scss';
+
 	@font-face {
 		font-family: yticon;
 		font-weight: normal;
@@ -365,6 +367,7 @@
 	video {
 		box-sizing: border-box;
 	}
+
 	/* 骨架屏替代方案 */
 	.Skeleton {
 		background: #f3f3f3;
