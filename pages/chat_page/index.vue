@@ -1,7 +1,6 @@
 <template>
 	<view :id="page_font_size">
 		<view class="flex_c page" @touchmove="touchmove">
-			<navigation ref="navigationRef" :groupCount="groupCount" :title="pagueObj.name" :group_id="pagueObj.id"></navigation>
 			<scroll-view
 				class="flex1 scroll-Y"
 				@tap.stop="onPage"
@@ -89,6 +88,8 @@ import openRedPacket from './components/open-red-packet/index';
 import operate from './components/operate/index';
 import { mapState } from 'vuex';
 
+import { getInfo } from '../../api/user';
+
 let lastMessageTimeStamp = null;
 
 let userInforMap = {};
@@ -170,18 +171,24 @@ export default {
 	},
 	async onLoad(e) {
 		imageList = [];
+		console.log(e)
+		this.pagueObj = {
+			id: Number(e.userId),
+			name: e.username?e.username:''
+		}
+		uni.setNavigationBarTitle({
+			title:e.username
+		})
 		envelopeClickList = uni.getStorageSync('envelopeClickList') || [];
 		lastMessageTimeStamp = e.lastMessageTimeStamp || null;
 		this.isHistoryGet = e.lastMessageTimeStamp;
+		const res = await getInfo()
+		let userInfo = res.data.user
 		this.own = {
-			id: Number(e.ownid),
-			name:e.ownname,
-			avatar: e.ownavatar
+			id: userInfo.userId,
+			name:userInfo.userName,
+			avatar: userInfo.avatar
 		};
-		this.pagueObj = {
-			id: Number(e.userid),
-			name: e.username
-		}
 		this.socket()
 		this.loadHistoryMessage();
 	},
@@ -224,13 +231,13 @@ export default {
 	methods: {
 		async getHistoryList(){
 			let token = uni.getStorageSync("token")
-			console.log(this.history.messages)
 			let timestamp = this.history.messages.length > 0?this.history.messages[this.history.messages.length - 1].timestamp:Date.now()
 			let data = await uni.request({
-				url:"/api/api/message/list",
+				url:"http://192.168.16.225:8081/api/message/list",
 				method: "POST",
 				header:{
-					"Authorization": token?token:"123123123"
+					"Authorization": "Bearer "+token,
+					"UserId": this.own.id
 				},
 				data: {
 					...this.page,
@@ -245,7 +252,7 @@ export default {
 		socket(){
 		    //创建webSocket
 		    this.webSocketTask = uni.connectSocket({
-			    url: 'ws://127.0.0.1:32255/ws?userId='+this.own.id,
+			    url: 'ws://192.168.16.225:32255/ws?userId='+this.own.id,
 				header: {
 					'content-type': 'application/json'
 				},

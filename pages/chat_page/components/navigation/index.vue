@@ -67,6 +67,7 @@
 <script>
 import { mapState } from 'vuex';
 import { to, show } from '@/utils/index.js';
+import uniPopup from '../../../../uni_modules/uni-popup/components/uni-popup/uni-popup.vue'
 import { EmojiDecoder, emojiMap } from '../../lib/EmojiDecoder.js';
 const emojiUrl = 'https://imgcache.qq.com/open/qcloud/tim/assets/emoji/';
 const decoder = new EmojiDecoder(emojiUrl, emojiMap);

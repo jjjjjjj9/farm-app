@@ -20,6 +20,13 @@ export function login(username, password, code) {
 	return postJsonRequest('/login', data)
 }
 
+export function loginByWeChat(datas){
+	const data = {
+		wechatId:datas.wechatId
+	}
+	return postJsonRequest('/loginByWeChat',data)
+}
+
 export function register(username, password, code) {
 	const uuid = uuidv4();
 	const data = {
@@ -35,6 +42,10 @@ export function register(username, password, code) {
 
 export function getProductList() {
 	return getRequest("/system/project/list")
+}
+
+export function getInfo() {
+	return getRequest("/getInfo")
 }
 
 export function updateUser(user) {

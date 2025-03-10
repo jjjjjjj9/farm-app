@@ -49,10 +49,10 @@
 		{
 			"path": "pages/chat_page/index",
 			"style": {
-				"navigationStyle": "custom",
+				// "navigationStyle": "custom",
 				"app-plus": {
-					"softinputNavBar": "none",
-					"bounce": "none"
+					// "softinputNavBar": "none",
+					// "bounce": "none"
 				}
 			}
 		},

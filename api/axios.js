@@ -2,7 +2,7 @@ import axios from 'axios'
 
 axios.defaults.timeout = 5000;
 
-export const base_url = "http://localhost/dev-api"
+export const base_url = "http://192.168.16.225:8080"
 
 
 
@@ -119,35 +119,6 @@ export function postJsonRequest(url, params) {
 		const token = uni.getStorageSync("token")
 		uni.request({
 			method: 'POST',
-			url: base_url + url,
-			data: params,
-			header: {
-				'Authorization': 'Bearer ' + token,
-				'Content-Type': 'application/json;charset=utf-8'
-			},
-			success: res => {
-				if (res.data.code == "401") {
-					uni.navigateTo({
-						url: '/pages/public/login'
-					})
-				}
-				console.log("res.data.code", res.data.code != "200")
-				if (res.data.code != "200") {
-					reject(res.data);
-				}
-				resolve(res)
-			},
-			fail: err => {
-				reject(err)
-			}
-		})
-	})
-}
-export function putJsonRequest(url, params) {
-	return new Promise((resolve, reject) => {
-		const token = uni.getStorageSync("token")
-		uni.request({
-			method: 'PUT',
 			url: base_url + url,
 			data: params,
 			header: {

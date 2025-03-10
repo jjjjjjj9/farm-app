@@ -43,7 +43,7 @@
 		mapMutations
 	} from 'vuex';
 	import {
-		login
+		login,loginByWeChat
 	} from '@/api/user'
 
 	export default {
@@ -72,6 +72,7 @@
 									uni.getUserInfo({
 										provider:"weixin",
 										success: (infoRes) => {
+											console.log(infoRes)
 											$that.wechatId = infoRes.userInfo.openId
 											resolve()
 										}
@@ -85,12 +86,13 @@
 		  },
 			loginByWeChatId(){
 			  this.getWeChatId().then(()=>{
-				  loginByWeChat(this.wechatId).then((res)=>{
-					  this.$store.commit('SET_TOKEN',res.token)
-					  setToken(res.token)
-					  this.loginSuccess()
-				  }).catch(() => {
-					  console.log('登陆失败')
+				  console.log(this.wechatId)
+				  loginByWeChat({wechatId: this.wechatId}).then((res)=>{
+					  uni.setStorageSync("token", res.data.token)
+					  console.log('res.token', res.data.token)
+					  uni.navigateBack();
+				  }).catch((res) => {
+					  console.log('登陆失败',res)
 					if (this.captchaEnabled) {
 					  this.getCode()
 					}

@@ -2,6 +2,7 @@
   "dependencies": {
     "@dcloudio/uni-ui": "^1.5.7",
     "axios": "^1.8.2",
+    "uview": "^0.1.0",
     "uview-ui": "^2.0.38"
   },
   "devDependencies": {

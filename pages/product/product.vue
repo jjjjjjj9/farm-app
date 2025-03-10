@@ -103,7 +103,6 @@
 				<text class="yticon icon-shoucang"></text>
 				<text>咨询</text>
 			</view>
-
 			<view class="action-btn-group">
 				<button type="primary" class=" action-btn no-border buy-now-btn" @click="buy">立即预定</button>
 				<!-- <button type="primary" class=" action-btn no-border add-cart-btn">加入购物车</button> -->
@@ -311,12 +310,12 @@
 				this.favorite = !this.favorite;
 			},
 			toAsk() {
+				console.log(this.projectInfo)
 				uni.navigateTo({
-					url: `/pages/chat_page/index`
+					url: `/pages/chat_page/index?userId=${this.projectInfo.ownerId}&username=${this.projectInfo.ownerUsername}`
 				})
 			},
 			async buy() {
-				console.log(this.projectInfo)
 				const res = await createOrder(this.projectInfo)
 				console.log(res)
 				if (res.data.code == '200') {

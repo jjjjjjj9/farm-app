@@ -1,22 +1,19 @@
 <template>
 	<view>
-		<view class="notice-item">
-			<text class="time">11:30</text>
+		<view class="notice-item" v-for="item in history.messages">
+			<text class="time">{{new Date(item.timestamp).toUTCString()}}</text>
 			<view class="content">
-				<text class="title">新品上市，全场满199减50</text>
-				<view class="img-wrapper">
-					<image class="pic" src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556465765776&di=57bb5ff70dc4f67dcdb856e5d123c9e7&imgtype=0&src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F01fd015aa4d95fa801206d96069229.jpg%401280w_1l_2o_100sh.jpg"></image>
-				</view>
+				<text class="title">用户：{{item.senderData.name}}</text>
 				<text class="introduce">
-					虽然做了一件好事，但很有可能因此招来他人的无端猜测，例如被质疑是否藏有其他利己动机等，乃至谴责。即便如此，还是要做好事。
+					消息：{{item.payload.text}}
 				</text>
 				<view class="bot b-t">
-					<text>查看详情</text>
+					<text @click="toChat(item)">查看详情</text>
 					<text class="more-icon yticon icon-you"></text>
 				</view>
 			</view>
 		</view>
-		<view class="notice-item">
+		<!-- <view class="notice-item">
 			<text class="time">昨天 12:30</text>
 			<view class="content">
 				<text class="title">新品上市，全场满199减50</text>
@@ -31,8 +28,8 @@
 					<text class="more-icon yticon icon-you"></text>
 				</view>
 			</view>
-		</view>
-		<view class="notice-item">
+		</view> -->
+		<!-- <view class="notice-item">
 			<text class="time">2019-07-26 12:30</text>
 			<view class="content">
 				<text class="title">新品上市，全场满199减50</text>
@@ -48,19 +45,73 @@
 					<text class="more-icon yticon icon-you"></text>
 				</view>
 			</view>
-		</view>
+		</view> -->
 	</view>
 </template>
 
 <script>
+	import { getInfo } from '../../api/user'
 	export default {
 		data() {
 			return {
-
+				history: {
+					messages: [],
+					allLoaded: false
+				},
+				own:{}
 			}
 		},
+		async onLoad() {
+			const res = await getInfo()
+			console.log(res)
+			let userInfo = res.data.user
+			this.own = {
+				id: userInfo.userId,
+				name:userInfo.userName,
+				avatar: userInfo.avatar
+			};
+			this.loadHistoryMessage()
+		},
 		methods: {
-
+			toChat(item){
+				uni.navigateTo({
+					url: `/pages/chat_page/index?userId=${item.senderData.senderId}&username=${item.senderData.name}`
+				})
+			},
+			// 获取聊天记录
+			async loadHistoryMessage() {
+				let list = await this.getHistoryList()
+				// list = list.reverse();
+				// 同步混入数据
+				list.forEach((im, ix) => {
+					// 缓存照片地址，
+					if (im.type === 'image' || im.type === 'image_transmit') {
+						imageList.unshift(im.payload.url);
+					}
+				});
+			
+				this.history.messages = [...this.history.messages,...list];
+				console.log(this.history.messages)
+			},
+			async getHistoryList(){
+				let token = uni.getStorageSync("token")
+				let timestamp = this.history.messages.length > 0?this.history.messages[this.history.messages.length - 1].timestamp:Date.now()
+				let data = await uni.request({
+					url:"http://192.168.16.225:8081/api/message/list",
+					method: "POST",
+					header:{
+						"Authorization": "Bearer "+token,
+						"UserId": this.own.id
+					},
+					data: {
+						pageSize:10,
+						pageNum:1,
+						timestamp: timestamp
+					}
+				})
+				if (data.data.code !== 0)return
+				return data.data.data
+			},
 		}
 	}
 </script>
