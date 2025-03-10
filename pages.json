@@ -230,6 +230,7 @@
 		"navigationBarBackgroundColor": "#FFFFFF",
 		"backgroundColor": "#f8f8f8"
 	},
+
 	"tabBar": {
 		"color": "#C0C4CC",
 		"selectedColor": "#fa436a",

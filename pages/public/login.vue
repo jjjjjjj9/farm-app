@@ -29,6 +29,12 @@
 			还没有账号?
 			<text @click="toRegist">马上注册</text>
 		</view>
+		<view class="weixin-login">
+			<view class="weixin-content">
+				<image src="../../static/wechat.svg" style="width:20px;height: 20px;"></image>
+				<view class="grid-text" @click="loginByWeChatId">微信</view>
+			</view>
+		</view>
 	</view>
 </template>
 
@@ -45,13 +51,53 @@
 			return {
 				mobile: '',
 				password: '',
-				logining: false
+				logining: false,
+				wechatId: ''
 			}
 		},
 		onLoad() {
 
 		},
 		methods: {
+			getWeChatId(){
+			  return new Promise((resolve,reject)=>{
+				  let $that = this
+				  uni.getProvider({
+					service:'oauth',
+					success: (res) => {
+						if(res.provider.indexOf(('weixin'))){
+							uni.login({
+								provider:"weixin",
+								success: (loginRes) => {
+									uni.getUserInfo({
+										provider:"weixin",
+										success: (infoRes) => {
+											$that.wechatId = infoRes.userInfo.openId
+											resolve()
+										}
+									})
+								}
+							})
+						}
+					}
+				}) 
+			})
+		  },
+			loginByWeChatId(){
+			  this.getWeChatId().then(()=>{
+				  loginByWeChat(this.wechatId).then((res)=>{
+					  this.$store.commit('SET_TOKEN',res.token)
+					  setToken(res.token)
+					  this.loginSuccess()
+				  }).catch(() => {
+					  console.log('登陆失败')
+					if (this.captchaEnabled) {
+					  this.getCode()
+					}
+				  })
+			  })
+			  
+		  },
 			// ...mapMutations(['login']),
 			inputChange(e) {
 				const key = e.currentTarget.dataset.key;
@@ -105,6 +151,27 @@
 <style lang='scss'>
 	page {
 		background: #fff;
+	}
+	.weixin-login{
+		display: flex;
+		flex-direction: row;
+		width:100%;
+		align-items: center;
+		justify-content: center;
+		gap: 10rpx;
+		
+	}
+	.weixin-content{
+		display: flex;
+		flex-direction: row;
+		width:40%;
+		align-items: center;
+		justify-content: center;
+		border: 1px solid rgb(244, 230, 210);
+		/* background-color: rgb(0, 122, 255); */
+		padding: 10rpx;
+		border-radius: 10rpx;
+		gap: 10rpx;
 	}
 
 	.container {
